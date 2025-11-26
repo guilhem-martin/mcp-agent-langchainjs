@@ -1,5 +1,5 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-import { z } from 'zod';
+import { z } from 'zod/v3';
 import { tools } from './tools.js';
 
 export function getMcpServer() {
@@ -16,13 +16,13 @@ export function getMcpServer() {
 
 // Helper that wraps MCP tool creation
 // It handles arguments typing, error handling and response formatting
-export function createMcpTool<T extends z.ZodTypeAny>(
+export function createMcpTool(
   server: McpServer,
   options: {
     name: string;
     description: string;
-    schema?: z.ZodObject<z.ZodRawShape, any, T>;
-    handler: (args: z.infer<z.ZodObject<z.ZodRawShape, any, T>>) => Promise<string>;
+    schema?: z.ZodType;
+    handler: (args: z.ZodRawShape) => Promise<string>;
   },
 ) {
   if (options.schema) {
@@ -30,7 +30,7 @@ export function createMcpTool<T extends z.ZodTypeAny>(
       options.name,
       {
         description: options.description,
-        inputSchema: options.schema,
+        inputSchema: options.schema as any, // Not pretty but fails to infer correctly otherwise
       },
       async (args: z.ZodRawShape) => {
         try {

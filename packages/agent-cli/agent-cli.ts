@@ -152,19 +152,11 @@ export async function run() {
       'https://cognitiveservices.azure.com/.default',
     );
     const model = new ChatOpenAI({
-      configuration: {
-        baseURL: azureOpenAiEndpoint,
-        async fetch(url, init = {}) {
-          const token = await getToken();
-          const headers = new Headers(init.headers);
-          headers.set('Authorization', `Bearer ${token}`);
-          return fetch(url, { ...init, headers });
-        },
-      },
+      configuration: { baseURL: azureOpenAiEndpoint },
       modelName: process.env.AZURE_OPENAI_MODEL ?? 'gpt-5-mini',
       streaming: true,
       useResponsesApi: true,
-      apiKey: 'not_used',
+      apiKey: getToken,
     });
 
     client = new Client({

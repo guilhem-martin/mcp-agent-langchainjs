@@ -1,13 +1,13 @@
 ---
-title: 'Host Your Node.js MCP Server on Azure Functions in 3 Simple Steps'
+title: 'Host Your Node.js MCP Server on Azure Functions in 1 Simple Step'
 published: false
 description: 'Learn how to deploy Model Context Protocol (MCP) servers to Azure Functions with serverless scaling and the official Anthropic SDK'
 tags: 'webdev, javascript, ai, azure'
 cover_image: ./assets/banner.jpg
-canonical_url: null
+canonical_url: 'https://developer.microsoft.com/blog/host-your-node-js-mcp-server-on-azure-functions-in-3-simple-steps'
 ---
 
-# Host Your Node.js MCP Server on Azure Functions in 3 Simple Steps
+# Host Your Node.js MCP Server on Azure Functions in 1 Simple Step
 
 Building AI agents with the Model Context Protocol (MCP) is powerful, but when it comes to hosting your MCP server in production, you need a solution that's reliable, scalable, and cost-effective. What if you could deploy your regular Node.js MCP server to a serverless platform that handles scaling automatically while you only pay for what you use?
 
@@ -18,7 +18,7 @@ Grab your favorite hot beverage, and let's dive in!
 ## TL;DR key takeaways
 
 - Azure Functions now supports hosting Node.js MCP servers using the official Anthropic SDK
-- Only 3 simple configurations needed: `host.json`, port configuration, and `function.json`
+- Only 1 simple configuration needed: adding `host.json` file
 - Currently supports HTTP Streaming protocol with stateless servers
 - Serverless hosting means automatic scaling and pay-per-use pricing
 - Deploy with one command using Infrastructure as Code
@@ -63,17 +63,17 @@ Azure Functions is a serverless compute platform that's perfect for MCP servers:
 
 - **Zero infrastructure management**: No servers to maintain
 - **Automatic scaling**: Handles traffic spikes seamlessly
-- **Cost-effective**: Pay only for actual execution time (with generous free tier)
+- **Cost-effective**: Pay only for actual execution time (with generous free grant)
 - **Built-in monitoring**: Application Insights integration out of the box
 - **Global distribution**: Deploy to regions worldwide
 
 The new Azure Functions support means you can take your existing Node.js MCP server and deploy it to a production-ready serverless environment with minimal changes. This comes up as an additional option for native Node.js MCP hosting, but you can still use the [Azure Functions MCP bindings](https://learn.microsoft.com/azure/azure-functions/functions-bindings-mcp?pivots=programming-language-typescript) that were available before.
 
-## 3 simple steps to enable Functions hosting
+## 1 simple steps to enable Functions hosting
 
 Let's break down what you need to add to your existing Node.js MCP server to run it on Azure Functions. I'll use a [real-world example](https://github.com/Azure-Samples/mcp-agent-langchainjs/tree/main/packages/burger-mcp) from our burger ordering system.
 
-If you already have a working Node.js MCP server, you can just follow these three steps to make it compatible with Azure Functions hosting.
+If you already have a working Node.js MCP server, you can just follow this to make it compatible with Azure Functions hosting.
 
 ### Step 1: Add the `host.json` configuration
 
@@ -103,60 +103,17 @@ Create a `host.json` file at the root of your Node.js project:
 
 The `hosts.json` file holds [metadata configuration](https://learn.microsoft.com/azure/azure-functions/functions-host-json) for the Functions runtime. The most important part here is the `customHandler` section. It configures the Azure Functions runtime to run your Node.js MCP server as a *custom handler*, which allows you to use any HTTP server framework (like Express, Fastify, etc.) without modification (**tip: it can do more than MCP servers!** 😉).
 
-### Step 2: Configure the port correctly
-
-In your server code, use the special environment variable that Azure Functions provides:
-
-```typescript
-const PORT = process.env.FUNCTIONS_CUSTOMHANDLER_PORT || process.env.PORT || 3000;
-
-app.listen(PORT, () => {
-  console.log(`MCP server listening on port ${PORT}`);
-});
-```
-
-While most applications use the `PORT` environment variable, Azure Functions requires `FUNCTIONS_CUSTOMHANDLER_PORT` for custom handlers. This can usually be easily accommodated with a fallback, so you're not breaking compatibility with local development or other hosting environments.
-
-**Note:** This is the only code change you need to make to your existing MCP server!
-
-### Step 3: Add the `handler/function.json` file
-
-Create a `handler` directory with a `function.json` file and add the following content:
-
-```json
-{
-  "bindings": [
-    {
-      "authLevel": "anonymous",
-      "type": "httpTrigger",
-      "direction": "in",
-      "name": "req",
-      "methods": ["get", "post", "put", "delete", "patch", "head", "options"],
-      "route": "{*route}"
-    },
-    {
-      "type": "http",
-      "direction": "out",
-      "name": "res"
-    }
-  ]
-}
-```
-
-This file tells Azure Functions to route **all** HTTP requests to your MCP server. No configuration needed here, and this boilerplate file might even not be necessary in future versions.
-
-Aaand you're done with the configuration. That's it! 😎
+There's no step 2 or 3. That's it! 😎
 
 > **Note:** We're not covering the authentication and authorization aspects of Azure Functions here, but you can easily [add those later if needed](https://learn.microsoft.com/azure/app-service/overview-authentication-authorization).
 
 ### Automated setup with GitHub Copilot
 
-While these changes are pretty straightforward, you might want to automate this (boring) process. That's why we have AI tools for, right?
+While this change is pretty straightforward, you might want to automate this (boring) process. That's why we have AI tools for, right?
 
 My friend Anthony Chu created an awesome GitHub Copilot prompt that automates this entire setup process. Just ask Copilot to use the prompt from [create-functions-mcp-server](https://github.com/anthonychu/create-functions-mcp-server) and it will:
 
-- Add the necessary configuration files
-- Update the code where needed for the port configuration
+- Add the necessary configuration file
 - Set up the Infrastructure as Code
 
 If you're not using Copilot, you can also copy the prompt instructions from the repo in your favorite AI coding assistant.
@@ -203,8 +160,8 @@ app.all('/mcp', async (request: Request, response: Response) => {
   // Note: error handling not shown for brevity
 });
 
-// The magic port configuration
-const PORT = process.env.FUNCTIONS_CUSTOMHANDLER_PORT || process.env.PORT || 3000;
+// The port configuration
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Burger MCP server listening on port ${PORT}`);
 });
@@ -374,15 +331,15 @@ But if you're only interested in the MCP server part, then you might want to loo
 
 Azure Functions Flex Consumption pricing is attractive for MCP servers:
 
-- **Free tier**: 1 million requests and 400,000 GB-s execution time per month
-- **After free tier**: Pay only for actual execution time
+- **Free grant**: 1 million requests and 400,000 GB-s execution time per month
+- **After free grant**: Pay only for actual execution time
 - **Automatic scaling**: From zero to hundreds of instances
 
-The free tier is generous enough to allow running a typical MCP server with moderate usage, and all the experimentation you might need. It's easy to configure the scaling limits to control costs as needed, with an option to scale down to zero when idle. This flexibility is why Functions is my personal go-to choice for TypeScript projects on Azure.
+The free grant is generous enough to allow running a typical MCP server with moderate usage, and all the experimentation you might need. It's easy to configure the scaling limits to control costs as needed, with an option to scale down to zero when idle. This flexibility is why Functions is my personal go-to choice for TypeScript projects on Azure.
 
 ## Wrap up
 
-Hosting MCP servers on Azure Functions gives you the best of both worlds: the simplicity of serverless infrastructure and the power of the official Anthropic SDK. With just **three simple configuration steps**, you can take your existing Node.js MCP server and deploy it to a production-ready, auto-scaling platform.
+Hosting MCP servers on Azure Functions gives you the best of both worlds: the simplicity of serverless infrastructure and the power of the official Anthropic SDK. With just **one simple configuration step**, you can take your existing Node.js MCP server and deploy it to a production-ready, auto-scaling platform.
 
 The combination of MCP's standardized protocol and Azure's serverless platform means you can focus on building amazing AI experiences instead of managing infrastructure. Boom. 😎
 

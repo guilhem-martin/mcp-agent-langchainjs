@@ -21,6 +21,20 @@ export function getMcpServer() {
     }),
   );
 
+    // Get a specific burger by its ID
+  server.registerTool(
+    'get_burger_by_id',
+    {
+      description: 'Get a specific burger by its ID',
+      inputSchema: z.object({
+        id: z.string().describe('ID of the burger to retrieve'),
+      }),
+    },
+    async (args) => createToolResponse(async () => {
+      return fetchBurgerApi(`/api/burgers/${args.id}`);
+    }),
+  );
+
 
 // Wraps standard fetch to include the base URL and handle errors
 async function fetchBurgerApi(url: string, options: RequestInit = {}): Promise<Record<string, any>> {

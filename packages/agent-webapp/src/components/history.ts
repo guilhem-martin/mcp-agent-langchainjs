@@ -28,7 +28,7 @@ export type HistoryComponentOptions = {
 };
 
 export const historyDefaultOptions: HistoryComponentOptions = {
-  apiUrl: '',
+  apiUrl: '/api',
   strings: {
     openSidebar: 'Open sidebar',
     closeSidebar: 'Close sidebar',
@@ -155,7 +155,7 @@ export class HistoryComponent extends LitElement {
     }
   }
 
-  protected getApiUrl = () => this.options.apiUrl || import.meta.env.VITE_API_URL || '';
+  protected getApiUrl = () => this.options.apiUrl || import.meta.env.VITE_API_URL || '/api';
 
   protected renderLoader = () =>
     this.isLoading ? html`<slot name="loader"><div class="loader-animation"></div></slot>` : nothing;

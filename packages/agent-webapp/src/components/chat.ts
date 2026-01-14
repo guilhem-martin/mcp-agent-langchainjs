@@ -40,7 +40,7 @@ export type ChatComponentOptions = ChatRequestOptions & {
 };
 
 export const chatDefaultOptions: ChatComponentOptions = {
-  apiUrl: '',
+  apiUrl: '/api',
   enablePromptSuggestions: true,
   enableMarkdown: true,
   enableDebug: true,
